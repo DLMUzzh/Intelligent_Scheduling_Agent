@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
 
@@ -18,7 +19,12 @@ ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / 'test-results'
 
 
-def run(install: bool = False, batch: bool = False) -> None:
+def run(
+    install: bool = False,
+    batch: bool = False,
+    exercise: Callable | None = None,
+    report_name: str | None = None,
+) -> None:
     OUTPUT.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='fleetwise-foundation-') as temporary:
         temporary_path = Path(temporary)
@@ -100,8 +106,8 @@ def run(install: bool = False, batch: bool = False) -> None:
                             const response = await fetch('/api/v1/operations', {
                                 method: 'POST', headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({
-                                    request_key: crypto.randomUUID(), action_code: 'CREATE_DRIVER',
-                                    target_type: 'DRIVER', target_id: null, payload: {name: 'scope exercise'},
+                                    request_key: crypto.randomUUID(), action_code: 'CREATE_PLAN',
+                                    target_type: 'PLAN', target_id: null, payload: {},
                                     expected_versions_json: {business_revision: '1'}
                                 })
                             });
@@ -164,13 +170,17 @@ def run(install: bool = False, batch: bool = False) -> None:
                         'business_data': 'empty',
                         'sqlite_version': sqlite3.sqlite_version,
                     }
+                    if exercise is not None:
+                        report['base_data'] = exercise(url, database)
             finally:
                 if process.poll() is None:
                     subprocess.run(
                         ['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True, check=False
                     )
                 process.wait(timeout=15)
-    report_name = 'foundation-batch-verification.json' if batch else 'foundation-verification.json'
+    report_name = report_name or (
+        'foundation-batch-verification.json' if batch else 'foundation-verification.json'
+    )
     (OUTPUT / report_name).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     print(json.dumps(report, ensure_ascii=False))
 

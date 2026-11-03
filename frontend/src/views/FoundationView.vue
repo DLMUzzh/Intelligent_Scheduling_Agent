@@ -54,7 +54,7 @@ onMounted(local.refresh)
           <strong>{{ name }}</strong><span class="capability-description">{{ description }}</span>
         </li>
       </ul>
-      <p class="phase-note">业务模块将在后续阶段通过专用适配器接入公共协议。</p>
+      <p class="phase-note">基础资料管理已通过专用适配器接入公共协议，操作记录可在左侧导航查看。</p>
     </section>
   </section>
 </template>

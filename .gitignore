@@ -7,7 +7,7 @@ test-results/
 *.log
 data/active/
 data/backups/
-logs/
+/logs/
 frontend/node_modules/
 frontend/dist/
 .runtime/

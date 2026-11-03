@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import sessionmaker
 from starlette.exceptions import HTTPException
 
+from app.api.base_data import router as base_data_router
 from app.api.foundation import router
 from app.core.config import ROOT
 from app.core.exceptions import BusinessError
@@ -21,6 +22,7 @@ from app.core.responses import ApiError, error_response, logger
 from app.core.runtime import RuntimeSettings, runtime_settings
 from app.database.foundation import CommitUncertain, build_engine
 from app.database.migrate import initialize_database
+from app.services.base_data_service import base_data_adapters
 from app.services.confirmation_service import ConfirmationService
 
 
@@ -76,9 +78,12 @@ def create_app(database_engine=None, *, config: RuntimeSettings | None = None, a
 
     application = FastAPI(title=selected_config.app_name, version='1.0.0', lifespan=lifespan)
     application.state.session_factory = factory
-    application.state.confirmation_service = ConfirmationService(factory, adapters)
+    application.state.confirmation_service = ConfirmationService(
+        factory, base_data_adapters() if adapters is None else adapters
+    )
     application.state.runtime_config = selected_config
     application.include_router(router)
+    application.include_router(base_data_router)
 
     @application.middleware('http')
     async def access_boundary(request: Request, call_next):

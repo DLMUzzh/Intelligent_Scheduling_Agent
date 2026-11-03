@@ -66,6 +66,7 @@ class PreparedAction:
 class ActionExecution:
     result: ExecutionResult
     after: object
+    audit_changes: list[dict] | None = None
 
 
 class OperationAdapter(Protocol):
@@ -272,7 +273,14 @@ class ConfirmationService:
                 if result['code'] not in ('ALREADY_CONFIRMED', 'NO_PENDING_DATES'):
                     current_revision = advance_revision(db, expected.business_revision)
                 self._finish(row, 'SUCCEEDED', result, confirmed=request.confirmed)
-                record_operation(db, row, outcome='SUCCEEDED', before=summary.before, after=execution.after)
+                record_operation(
+                    db,
+                    row,
+                    outcome='SUCCEEDED',
+                    before=summary.before,
+                    after=execution.after,
+                    changes=execution.audit_changes,
+                )
                 db.flush()
                 check_dates(result['affected_dates'])
                 reply = OperationReply(

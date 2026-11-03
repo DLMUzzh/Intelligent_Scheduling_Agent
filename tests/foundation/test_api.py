@@ -222,12 +222,12 @@ def test_write_busy_keeps_operation_pending(foundation):
     assert state(engine)['audits'] == 0
 
 
-def test_production_has_no_business_adapter(tmp_path):
+def test_explicit_empty_adapters_isolate_foundation_protocol(tmp_path):
     config = RuntimeSettings(
         database_url=f'sqlite:///{(tmp_path / "production.db").as_posix()}', log_directory=tmp_path / 'logs'
     )
     engine = build_engine(config)
-    app = create_app(engine, config=config)
+    app = create_app(engine, config=config, adapters={})
     with TestClient(app, base_url='http://127.0.0.1:8000', client=('127.0.0.1', 50000)) as client:
         response = client.post('/api/v1/operations', json=input_data(), headers=ORIGIN)
         assert response.status_code == 422 and response.json()['code'] == 'VALIDATION_ERROR'

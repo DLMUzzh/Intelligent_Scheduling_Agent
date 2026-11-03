@@ -14,6 +14,7 @@ def record_operation(
     after: object,
     errors: list[dict] | None = None,
     reason: str | None = None,
+    changes: list[dict] | None = None,
 ) -> None:
     summary = json.loads(operation.summary_json)
     db.add(
@@ -33,7 +34,9 @@ def record_operation(
                     'schema_version': '1',
                     'before': before,
                     'after': after,
-                    'changes': summary['changes'] if outcome == 'SUCCEEDED' else [],
+                    'changes': (changes if changes is not None else summary['changes'])
+                    if outcome == 'SUCCEEDED'
+                    else [],
                     'affected_dates': summary['affected_dates'],
                     'errors': errors or [],
                 },
