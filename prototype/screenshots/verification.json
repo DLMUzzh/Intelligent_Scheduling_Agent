@@ -1,0 +1,21 @@
+{
+  "passed": 15,
+  "checks": [
+    "six-page navigation",
+    "invalid edit preserves draft; valid edit persists",
+    "partial-demand confirmation and persistence",
+    "formal changes display diff and preserve history",
+    "history driver, status and unallocated-demand filters",
+    "cancel releases schedule and allows reconfirmation",
+    "atomic batch validation, skip confirmed dates, duplicate confirmation",
+    "resource change protects formal schedule; resource creation",
+    "plan overlap, demand ordering and per-day overrides",
+    "Agent changes require explicit confirmation",
+    "historical dates are read-only",
+    "mobile layout and navigation",
+    "stale page cannot overwrite newer data",
+    "empty initialization and zero-resource empty-draft protection",
+    "add and delete task packages using free resources"
+  ],
+  "browser_errors": []
+}
